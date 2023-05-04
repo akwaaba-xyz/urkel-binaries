@@ -1,0 +1,3739 @@
+tests:
+  - name: this
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define viewer: [user] as self
+        tuples:
+          - object: document:1
+            relation: viewer
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: computed_userset
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define viewer as writer
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: writer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:aardvark
+              type: document
+              relation: writer
+            expectation:
+              - document:1
+
+  - name: tuple_to_userset
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define viewer: [user] as self
+          
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as viewer from parent
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:x
+          - object: folder:x
+            relation: viewer
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: this_and_union
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define viewer: [user] as self or writer
+        tuples:
+          - object: document:1
+            relation: viewer
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+
+  - name: this_and_intersection
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define viewer: [user] as self and writer
+        tuples:
+          - object: document:1
+            relation: viewer
+            user: user:aardvark
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:2
+            relation: viewer
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: this_and_exclusion_base
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define viewer: [user] as self but not writer
+        tuples:
+          - object: document:1
+            relation: viewer
+            user: user:aardvark
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:2
+            relation: viewer
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: computed_userset_and_computed_userset
+    stages:
+      - model: |
+          type user
+
+          type document
+            relations
+              define owner: [user] as self
+              define writer as owner
+              define viewer as writer
+        tuples:
+          - object: document:1
+            relation: owner
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: computed_userset_and_union
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define viewer as writer or editor
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:2
+            relation: editor
+            user: user:badger
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+
+  - name: simple_computeduserset_indirect_ref
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define parent: [folder] as self
+              define viewer: [user] as self or viewer from parent
+              define can_view as viewer
+        tuples:
+          - user: user:anne
+            relation: viewer
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+
+  - name: computed_userset_and_intersection
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define viewer as writer and editor
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:3
+            relation: editor
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: computed_userset_and_exclusion
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define viewer as writer but not editor
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:3
+            relation: editor
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: tuple_to_userset_and_computed_userset
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define writer: [user] as self
+              define viewer as writer
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as viewer from parent
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: writer
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: tuple_to_userset_and_tuple_to_userset
+    stages:
+      - model: |
+          type user
+          
+          type group
+            relations
+              define member: [user] as self
+    
+          type folder
+            relations
+              define parent: [group] as self
+              define viewer as member from parent
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as viewer from parent
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: parent
+            user: group:G
+          - object: group:G
+            relation: member
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: tuple_to_userset_and_union
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define viewer as writer or editor
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as viewer from parent
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: writer
+            user: user:aardvark
+          - object: folder:X
+            relation: editor
+            user: user:badger
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: tuple_to_userset_and_intersection
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define viewer as writer and editor
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as viewer from parent
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: writer
+            user: user:aardvark
+          - object: folder:X
+            relation: editor
+            user: user:aardvark
+          - object: folder:X
+            relation: writer
+            user: user:badger
+          - object: folder:X
+            relation: editor
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: tuple_to_userset_and_exclusion
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define viewer as writer but not editor
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as viewer from parent
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: writer
+            user: user:aardvark
+          - object: folder:X
+            relation: editor
+            user: user:aardvark
+          - object: folder:X
+            relation: writer
+            user: user:badger
+          - object: folder:X
+            relation: editor
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: union_and_tuple_to_userset
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define viewer: [user] as self
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define writer: [user] as self
+              define viewer as writer or (viewer from parent)
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: viewer
+            user: user:aardvark
+          - object: document:1
+            relation: writer
+            user: user:badger
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: union_and_union
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer or (editor or owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:2
+            relation: editor
+            user: user:badger
+          - object: document:3
+            relation: owner
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+              - document:3
+
+  - name: union_and_intersection
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer or (editor and owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:2
+            relation: editor
+            user: user:badger
+          - object: document:2
+            relation: owner
+            user: user:badger
+          - object: document:3
+            relation: editor
+            user: user:cheetah
+          - object: document:4
+            relation: owner
+            user: user:duck
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: union_and_exclusion
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer or (editor but not owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:badger
+          - object: document:2
+            relation: owner
+            user: user:badger
+          - object: document:3
+            relation: editor
+            user: user:cheetah
+          - object: document:4
+            relation: owner
+            user: user:duck
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: true
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+              - document:3
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: intersection_and_tuple_to_userset
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define viewer: [user] as self
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define writer: [user] as self
+              define viewer as writer and (viewer from parent)
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: viewer
+            user: user:aardvark
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: folder:X
+            relation: viewer
+            user: user:badger
+          - object: document:2
+            relation: writer
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: intersection_and_union
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer and (editor or owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: owner
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+          - object: document:4
+            relation: editor
+            user: user:duck
+          - object: document:5
+            relation: owner
+            user: user:eagle
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: false
+          - tuple:
+              object: document:5
+              relation: viewer
+              user: user:eagle
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:eagle
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: intersection_and_intersection
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer and (editor and owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:1
+            relation: owner
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: editor
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+          - object: document:3
+            relation: owner
+            user: user:cheetah
+          - object: document:4
+            relation: writer
+            user: user:duck
+          - object: document:5
+            relation: editor
+            user: user:eagle
+          - object: document:6
+            relation: owner
+            user: user:fox
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: false
+          - tuple:
+              object: document:5
+              relation: viewer
+              user: user:eagle
+            expectation: false
+          - tuple:
+              object: document:6
+              relation: viewer
+              user: user:fox
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:eagle
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:fox
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: intersection_and_exclusion
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer and (editor but not owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:1
+            relation: owner
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: editor
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+          - object: document:3
+            relation: owner
+            user: user:cheetah
+          - object: document:4
+            relation: writer
+            user: user:duck
+          - object: document:5
+            relation: editor
+            user: user:eagle
+          - object: document:6
+            relation: owner
+            user: user:fox
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: false
+          - tuple:
+              object: document:5
+              relation: viewer
+              user: user:eagle
+            expectation: false
+          - tuple:
+              object: document:6
+              relation: viewer
+              user: user:fox
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:eagle
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:fox
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: exclusion_and_computed_userset
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define viewer as writer but not editor
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:3
+            relation: editor
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: exclusion_and_tuple_to_userset_in_base
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define viewer: [user] as self
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define writer: [user] as self
+              define viewer as (viewer from parent) but not writer
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: viewer
+            user: user:aardvark
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: folder:X
+            relation: viewer
+            user: user:badger
+          - object: document:2
+            relation: writer
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: exclusion_and_tuple_to_userset_in_subtract
+    stages:
+      - model: |
+          type user
+          
+          type folder
+            relations
+              define viewer: [user] as self
+    
+          type document
+            relations
+              define parent: [folder] as self
+              define writer: [user] as self
+              define viewer as writer but not (viewer from parent)
+        tuples:
+          - object: document:1
+            relation: parent
+            user: folder:X
+          - object: folder:X
+            relation: viewer
+            user: user:aardvark
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: folder:X
+            relation: viewer
+            user: user:badger
+          - object: document:2
+            relation: writer
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:cheetah
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+
+  - name: exclusion_and_union_in_base
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as (writer or editor) but not owner
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:1
+            relation: owner
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: owner
+            user: user:badger
+          - object: document:3
+            relation: editor
+            user: user:cheetah
+          - object: document:3
+            relation: owner
+            user: user:cheetah
+          - object: document:4
+            relation: writer
+            user: user:duck
+          - object: document:5
+            relation: editor
+            user: user:eagle
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: true
+          - tuple:
+              object: document:5
+              relation: viewer
+              user: user:eagle
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+              - document:4
+          - request:
+              user: user:eagle
+              type: document
+              relation: viewer
+            expectation:
+              - document:5
+
+  - name: exclusion_and_union_in_subtract
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer but not (editor or owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: owner
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+              - document:3
+
+  - name: exclusion_and_intersection_in_base
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as (writer and editor) but not owner
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:1
+            relation: owner
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: editor
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+          - object: document:4
+            relation: editor
+            user: user:duck
+          - object: document:5
+            relation: owner
+            user: user:eagle
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: false
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: false
+          - tuple:
+              object: document:5
+              relation: viewer
+              user: user:eagle
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:eagle
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: exclusion_and_intersection_in_subtract
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer but not (editor and owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:1
+            relation: owner
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: editor
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+          - object: document:3
+            relation: owner
+            user: user:cheetah
+          - object: document:4
+            relation: writer
+            user: user:duck
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: true
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: true
+          - tuple:
+              object: document:4
+              relation: viewer
+              user: user:duck
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:2
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+              - document:3
+          - request:
+              user: user:duck
+              type: document
+              relation: viewer
+            expectation:
+              - document:4
+
+  - name: exclusion_and_exclusion_in_base
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as (writer but not editor) but not owner
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: owner
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+              - document:3
+
+  - name: exclusion_and_exclusion_in_subtract
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define writer: [user] as self
+              define editor: [user] as self
+              define owner: [user] as self
+              define viewer as writer but not (editor but not owner)
+        tuples:
+          - object: document:1
+            relation: writer
+            user: user:aardvark
+          - object: document:1
+            relation: editor
+            user: user:aardvark
+          - object: document:1
+            relation: owner
+            user: user:aardvark
+          - object: document:2
+            relation: writer
+            user: user:badger
+          - object: document:2
+            relation: editor
+            user: user:badger
+          - object: document:3
+            relation: writer
+            user: user:cheetah
+          - object: document:3
+            relation: owner
+            user: user:cheetah
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:2
+              relation: viewer
+              user: user:badger
+            expectation: false
+          - tuple:
+              object: document:3
+              relation: viewer
+              user: user:cheetah
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:badger
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:cheetah
+              type: document
+              relation: viewer
+            expectation:
+              - document:3
+
+  - name: userset_as_user
+    stages:
+      - model: |
+          type user
+          
+          type group
+            relations
+              define member: [user] as self
+    
+          type document
+            relations
+              define viewer: [group#member] as self
+        tuples:
+          - object: document:1
+            relation: viewer
+            user: group:x#member
+          - object: group:x
+            relation: member
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: group:x#member
+            expectation: true
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: group:x#member
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: wildcard_direct
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define viewer: [user:*] as self
+        tuples:
+          - object: document:public
+            relation: viewer
+            user: user:*
+        checkAssertions:
+          - tuple:
+              object: document:public
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+          - tuple:
+              object: document:public
+              relation: viewer
+              user: user:*
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:public
+          - request:
+              user: user:*
+              type: document
+              relation: viewer
+            expectation:
+              - document:public
+
+  - name: prior_type_restrictions_ignored
+    stages:
+      - model: |
+          type user
+
+          type document
+            relations
+              define viewer: [user] as self
+        tuples:
+          - object: document:1
+            relation: viewer
+            user: user:jon
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:jon
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:jon
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+      - model: |
+          type user
+          type employee
+
+          type document
+            relations
+              define viewer: [employee] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:jon
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:jon
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: wildcard_computed_userset
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define writer: [user:*] as self
+              define viewer: [user] as self or writer
+        tuples:
+          - object: document:public
+            relation: writer
+            user: user:*
+        checkAssertions:
+          - tuple:
+              object: document:public
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:public
+
+  - name: check_with_invalid_tuple_in_store
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define viewer: [user] as self
+          
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer: [user] as self or viewer from parent
+        tuples:
+          - object: folder:x
+            relation: viewer
+            user: user:aardvark
+          - object: document:1
+            relation: parent
+            user: folder:x
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: this_with_contextual_tuples
+    stages:
+      - model: |
+          type user
+          
+          type document
+            relations
+              define viewer: [user] as self
+        tuples:
+          - object: document:1
+            relation: viewer
+            user: user:aardvark
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+
+  - name: wildcard_and_userset_restriction
+    stages:
+      - model: |
+          type user
+          type user2
+          type group
+            relations
+              define member: [user2] as self
+          type document
+            relations
+              define viewer: [user:*, group#member] as self
+        tuples:
+          - object: document:public
+            relation: viewer
+            user: user:*
+          - object: document:public
+            relation: viewer
+            user: group:fga#member
+          - object: group:fga
+            relation: member
+            user: user2:bob
+        checkAssertions:
+          - tuple:
+              object: document:public
+              relation: viewer
+              user: user2:bob
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user2:bob
+              type: document
+              relation: viewer
+            expectation:
+              - document:public
+
+  - name: wildcard_obeys_the_types_in_stages
+    stages:
+      - model: |
+          type user
+          
+          type employee
+          
+          type document
+            relations
+              define writer: [employee:*] as self
+              define viewer: [user] as self or writer
+        tuples:
+          - object: document:1
+            relation: writer
+            user: employee:*
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: employee:badger
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: employee:badger
+              type: document
+              relation: viewer
+            expectation:
+              - document:1
+      - model: |
+          type user
+          
+          type employee
+          type document
+            relations
+              define writer: [user:*] as self
+              define viewer: [user] as self or writer
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            expectation: false
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: employee:badger
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:aardvark
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: employee:badger
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: validation_nil_tuple
+    stages:
+      - model: |
+          type user
+        checkAssertions:
+          - errorCode: 3
+
+  - name: validation_empty_tuple
+    stages:
+      - model: |
+          type user
+        checkAssertions:
+          - tuple:
+              object:
+              relation:
+              user:
+            errorCode: 2009
+
+  - name: validation_empty_object
+    stages:
+      - model: |
+          type user
+        checkAssertions:
+          - tuple:
+              object:
+              relation: viewer
+              user: user:aardvark
+            errorCode: 2009
+
+  - name: validation_empty_relation
+    stages:
+      - model: |
+          type user
+        checkAssertions:
+          - tuple:
+              object: user:aardvark
+              relation:
+              user: user:badger
+            errorCode: 2009
+
+  - name: validation_empty_user
+    stages:
+      - model: |
+          type user
+        checkAssertions:
+          - tuple:
+              object: user:aardvark
+              relation: viewer
+              user:
+            errorCode: 2009
+
+  - name: validation_relation_not_in_model
+    stages:
+      - model: |
+          type user
+        checkAssertions:
+          - tuple:
+              object: user:aardvark
+              relation: viewer
+              user: user:badger
+            errorCode: 2000
+
+  - name: validation_user_type_not_in_model
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: folder:x
+            errorCode: 2000
+
+  - name: validation_userset_type_not_in_model
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: folder:x#writer
+            errorCode: 2000
+
+  - name: validation_userset_relation_not_in_model
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: document:x#writer
+            errorCode: 2000
+
+  - name: validation_user_invalid
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: a:b:c
+            errorCode: 2000
+
+  - name: validation_invalid_object_type_in_contextual_tuple
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            contextualTuples:
+              - object: folder:x
+                relation: viewer
+                user: user:aardvark
+            errorCode: 2027
+
+  - name: validation_invalid_relation_in_contextual_tuple
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            contextualTuples:
+              - object: document:1
+                relation: writer
+                user: user:aardvark
+            errorCode: 2027
+
+  - name: validation_invalid_user_in_contextual_tuple
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            contextualTuples:
+              - object: document:1
+                relation: viewer
+                user: employee:aardvark
+            errorCode: 2027
+
+  - name: validation_invalid_wildcard_in_contextual_tuple
+    stages:
+      - model: |
+          type user
+          type document
+            relations
+              define viewer: [user] as self
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            contextualTuples:
+              - object: document:1
+                relation: viewer
+                user: user:*
+            errorCode: 2027
+
+  - name: val_contextual_tuples_and_wildcard_in_ttu_evaluation
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define viewer: [user] as self
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as viewer from parent
+        checkAssertions:
+          - tuple:
+              object: document:1
+              relation: viewer
+              user: user:aardvark
+            contextualTuples:
+              - object: document:1
+                relation: parent
+                user: user:*
+            errorCode: 2027
+
+  - name: relations_not_defined_in_some_child_type
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define owner: [user] as self
+              define writer: [user,user:*] as self or owner
+          type document
+            relations
+              define can_read as writer from parent
+              define parent: [document,folder] as self
+              define viewer: [user,user:*] as self
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              - document:c
+
+  # https://github.com/openfga/openfga/issues/576
+  - name: same_relation_name_different_type
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define owner: [user] as self
+              define viewer: [user, user:*] as self or owner
+          type document
+            relations
+              define can_read as viewer from parent
+              define parent: [document, folder] as self
+              define viewer: [user, user:*] as self
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:d
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              #document:d is not expected
+              - document:c
+
+  - name: computed_user_indirect_ref
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define parent: [folder] as self
+              define viewer: [user] as self or viewer from parent
+              define can_view as viewer
+          type document
+            relations
+              define can_read as can_view from parent
+              define parent: [document, folder] as self
+              define viewer: [user] as self
+        tuples:
+          - user: user:anne
+            relation: viewer
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:d
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              - document:c
+
+  - name: computed_user_indirect_ref_extra_indirection
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [folder] as self
+              define viewer: [user] as self or owner or viewer from parent
+              define can_view as viewer
+          type document
+            relations
+              define can_read as can_view from parent
+              define parent: [document, folder] as self
+              define viewer: [user, user:*] as self
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:d
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              - document:c
+
+  - name: three_prong_relation
+    stages:
+      - model: |
+          type user
+          type module
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [document, module] as self
+              define viewer: [user] as self or owner or viewer from parent
+          type folder
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [module, folder] as self
+              define viewer: [user] as self or owner or viewer from parent
+          type document
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [folder, document] as self
+              define viewer: [user] as self or owner or viewer from parent
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: module:a
+          - user: module:a
+            relation: parent
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: document:a
+          - user: document:a
+            relation: parent
+            object: module:b
+          - user: module:b
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:b
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: module:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: module:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:b
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: viewer
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+              - document:a
+              - document:b
+          - request:
+              user: user:anne
+              type: module
+              relation: viewer
+            expectation:
+              - module:a
+              - module:b
+
+  - name: three_prong_relation_loop
+    stages:
+      - model: |
+          type user
+          type module
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [document, module] as self
+              define viewer: [user] as self or owner or viewer from parent
+          type folder
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [module, folder] as self
+              define viewer: [user] as self or owner or viewer from parent
+          type document
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [folder, document] as self
+              define viewer: [user] as self or owner or viewer from parent
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: module:a
+          - user: module:a
+            relation: parent
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: document:a
+          - user: document:a
+            relation: parent
+            object: module:b
+          - user: module:b
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:b
+          - user: document:b
+            relation: parent
+            object: module:a
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: module:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: module:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:b
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: viewer
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+              - document:a
+              - document:b
+          - request:
+              user: user:anne
+              type: module
+              relation: viewer
+            expectation:
+              - module:a
+              - module:b
+
+  - name: three_prong_relation_possible_exclusion
+    stages:
+      - model: |
+          type user
+          type module
+            relations
+              define owner: [user] as self or has_owned from parent
+              define parent: [document, module] as self
+              define has_owned as owner
+              define viewer: [user] as self or has_owned or viewer from parent
+          type folder
+            relations
+              define owner: [user] as self or has_owned from parent
+              define parent: [module, folder] as self
+              define has_owned as owner
+              define viewer: [user] as self or has_owned or viewer from parent
+          type document
+            relations
+              define banned: [user] as self
+              define owner: [user] as self or has_owned from parent
+              define has_owned as owner but not banned
+              define parent: [folder, document] as self
+              define viewer: [user] as self or has_owned or viewer from parent
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: module:a
+          - user: module:a
+            relation: parent
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: document:a
+          - user: document:a
+            relation: parent
+            object: module:b
+          - user: module:b
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:b
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: module:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: module:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:b
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: viewer
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+              - document:a
+              - document:b
+          - request:
+              user: user:anne
+              type: module
+              relation: viewer
+            expectation:
+              - module:a
+              - module:b
+
+
+  - name: computed_user_multi_route
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define owner: [user] as self or owner from parent
+              define can_modify as owner
+              define parent: [folder] as self
+              define viewer: [user] as self or can_modify or viewer from parent
+              define can_view as viewer
+          type document
+            relations
+              define can_read as can_view from parent or can_modify from parent
+              define parent: [document, folder] as self
+              define viewer: [user, user:*] as self
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:d
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              - document:c
+
+  - name: computed_user_indirect_ref_same_rel_name
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define owner: [user] as self or owner from parent
+              define parent: [folder] as self
+              define viewer: [user] as self or owner or viewer from parent
+              define can_view as viewer
+          type document
+            relations
+              define can_view as can_view from parent
+              define parent: [document, folder] as self
+              define viewer: [user, user:*] as self
+        tuples:
+          - user: user:anne
+            relation: owner
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: document:d
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: can_view
+            expectation:
+              - document:c
+              - document:d
+
+  - name: computed_user_indirect_ref_wildcard
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define parent: [folder] as self
+              define viewer: [user, user:*] as self or viewer from parent
+              define can_view as viewer
+          type document
+            relations
+              define can_read as can_view from parent
+              define parent: [document, folder] as self
+              define viewer: [user, user:*] as self
+        tuples:
+          - user: user:*
+            relation: viewer
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:d
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              - document:c
+
+  - name: computed_user_indirect_ref_extra_indirection_wildcard
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define owner: [user, user:*] as self or owner from parent
+              define parent: [folder] as self
+              define viewer: [user, user:*] as self or owner or viewer from parent
+              define can_view as viewer
+          type document
+            relations
+              define can_read as can_view from parent
+              define parent: [document, folder] as self
+              define viewer: [user, user:*] as self
+        tuples:
+          - user: user:*
+            relation: owner
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:d
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              - document:c
+
+  - name: two_level_computed_user_indirect_ref
+    stages:
+      - model: |
+          type user
+          type folder
+            relations
+              define parent: [folder] as self
+              define viewer: [user] as self or viewer from parent
+              define can_look as viewer
+              define can_view as can_look
+
+          type document
+            relations
+              define can_read as can_view from parent
+              define parent: [document, folder] as self
+              define viewer: [user] as self
+        tuples:
+          - user: user:anne
+            relation: viewer
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:b
+            relation: parent
+            object: document:c
+          - user: document:c
+            relation: parent
+            object: document:d
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:c
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_read
+              object: document:d
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: can_read
+            expectation:
+              - document:c
+
+  - name: ttu_and_computed_ttu
+    stages:
+      - model: |
+          type user
+          type group
+            relations
+              define member: [user] as self
+          type folder
+            relations
+              define can_view as viewer or can_view from parent
+              define parent: [folder] as self
+              define viewer: [group#member] as self
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as can_view from parent
+        tuples:
+          - user: user:anne
+            relation: member
+            object: group:fga
+          - user: group:fga#member
+            relation: viewer
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:a
+            relation: parent
+            object: document:b
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:b
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+              - document:b
+
+  - name: ttu_and_computed_ttu_wildcard
+    stages:
+      - model: |
+          type user
+          type group
+            relations
+              define member: [user, user:*] as self
+          type folder
+            relations
+              define can_view as viewer or can_view from parent
+              define parent: [folder] as self
+              define viewer: [group#member] as self
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as can_view from parent
+        tuples:
+          - user: user:*
+            relation: member
+            object: group:fga
+          - user: group:fga#member
+            relation: viewer
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:a
+            relation: parent
+            object: document:b
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:b
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+              - document:b
+
+  - name: ttu_ttu_and_computed_ttu
+    stages:
+      - model: |
+          type user
+          type group
+            relations
+              define member: [user] as self
+          type module
+            relations
+              define can_view as viewer or can_view from parent
+              define parent: [module] as self
+              define viewer: [group#member] as self
+          type folder
+            relations
+              define parent: [module, folder] as self
+              define can_view as can_view from parent
+          type document
+            relations
+              define parent: [folder] as self
+              define viewer as can_view from parent
+        tuples:
+          - user: user:anne
+            relation: member
+            object: group:fga
+          - user: group:fga#member
+            relation: viewer
+            object: module:a
+          - user: module:a
+            relation: parent
+            object: folder:a
+          - user: folder:a
+            relation: parent
+            object: folder:b
+          - user: folder:a
+            relation: parent
+            object: document:b
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: folder:b
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:b
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: folder
+              relation: can_view
+            expectation:
+              - folder:a
+              - folder:b
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+              - document:b
+
+  - name: contextual_tuple_ref_relation_disjoint
+    stages:
+      - model: |
+          type user
+          type company
+            relations
+              define admin: [user] as self
+              define management: [user] as self
+              define employee: [user] as self or admin
+          type group
+            relations
+              define corp: [company] as self
+              define member as employee from corp
+          type document
+            relations
+              define viewer: [group#member] as self
+          type diagram
+            relations
+              define parent: [document] as self
+              define viewer as viewer from parent
+        tuples:
+          - object: company:abc
+            relation: management
+            user: user:anne
+          - object: group:fga
+            relation: corp
+            user: company:abc
+          - object: document:a
+            relation: viewer
+            user: group:fga#member
+          - object: diagram:a
+            relation: parent
+            user: document:a
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:a
+            expectation: false
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: diagram:a
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+          - request:
+              user: user:anne
+              type: diagram
+              relation: viewer
+            expectation:
+
+  - name: reverse_expand_relation_not_match
+    stages:
+      - model: |
+          type user
+          type company
+            relations
+              define admin: [user] as self
+              define management: [user] as self
+              define employee: [user] as self or admin
+          type group
+            relations
+              define observer: [company] as self
+              define owner: [company] as self
+              define admin as admin from owner
+              define member as employee from owner
+          type document
+            relations
+              define owner: [group] as self
+              define viewer as member from owner or observer from owner
+        tuples:
+          - object: company:abc
+            relation: employee
+            user: user:anne
+          - object: document:a
+            relation: owner
+            user: group:fga
+          - object: group:fga
+            relation: observer
+            user: company:abc
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:a
+            expectation: false
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+
+  - name: exclusion_for_some_relations
+    stages:
+      - model: |
+          type user
+          type group
+            relations
+              define member: [user] as self
+          type folder
+            relations
+              define owner: [group] as self
+              define viewer as member from owner
+          type document
+            relations
+              define banned: [user] as self
+              define owner: [folder] as self
+              define viewer as viewer from owner
+              define can_view as viewer but not banned
+        tuples:
+          - user: user:anne
+            relation: member
+            object: group:fga
+          - user: group:fga
+            relation: owner
+            object: folder:a
+          - user: folder:a
+            relation: owner
+            object: document:a
+        checkAssertions:
+          - tuple:
+              user: user:anne
+              relation: viewer
+              object: document:a
+            expectation: true
+          - tuple:
+              user: user:anne
+              relation: can_view
+              object: document:a
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:anne
+              type: document
+              relation: viewer
+            expectation:
+              - document:a
+          - request:
+              user: user:anne
+              type: document
+              relation: can_view
+            expectation:
+              - document:a
+
+  - name: evaluate_userset_in_computed_relation_of_ttu
+    stages:
+      - model: |
+          type user
+          type repo
+            relations
+              define owner: [organization] as self
+              define reader as repo_admin from owner
+          type organization
+            relations
+              define member: [user] as self
+              define repo_admin: [organization#member] as self
+        tuples:
+          - user: organization:openfga
+            relation: owner
+            object: repo:openfga/openfga
+          - user: organization:openfga#member
+            relation: repo_admin
+            object: organization:openfga
+          - user: user:erik
+            relation: member
+            object: organization:openfga
+        checkAssertions:
+          - tuple:
+              user: user:erik
+              relation: reader
+              object: repo:openfga/openfga
+            expectation: true
+        listObjectsAssertions:
+          - request:
+              user: user:erik
+              type: repo
+              relation: reader
+            expectation:
+              - repo:openfga/openfga

@@ -1,0 +1,7 @@
+.env
+*.crt
+*.key
+*.csr
+.DS_Store
+macopenfga
+dev/

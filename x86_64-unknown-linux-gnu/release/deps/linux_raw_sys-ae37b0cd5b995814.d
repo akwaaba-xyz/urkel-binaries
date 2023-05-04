@@ -1,0 +1,10 @@
+/Users/rudyfraser/Projects/papertree-urkel/x86_64-unknown-linux-gnu/release/deps/linux_raw_sys-ae37b0cd5b995814.rmeta: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/errno.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/general.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/ioctl.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/x86_64-unknown-linux-gnu/release/deps/liblinux_raw_sys-ae37b0cd5b995814.rlib: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/errno.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/general.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/ioctl.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/x86_64-unknown-linux-gnu/release/deps/linux_raw_sys-ae37b0cd5b995814.d: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/errno.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/general.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/ioctl.rs
+
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/lib.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/errno.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/general.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/linux-raw-sys-0.3.4/src/x86_64/ioctl.rs:

@@ -1,0 +1,2 @@
+web: ROCKET_PORT=$PORT ROCKET_ADDRESS=0.0.0.0 ./dev/x86_64-apple-darwin/release/urkel
+fga: OPENFGA_HTTP_ADDR=0.0.0.0:8001 ./macopenfga run --datastore-engine postgres --datastore-uri $DATABASE_URL --metrics-enabled=false

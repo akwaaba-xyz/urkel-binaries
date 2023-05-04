@@ -1,0 +1,11 @@
+/Users/rudyfraser/Projects/papertree-urkel/x86_64-unknown-linux-gnu/release/deps/uncased-f7fb80d3681fb1a7.rmeta: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/serde.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/owned.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/borrowed.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/as_uncased.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/x86_64-unknown-linux-gnu/release/deps/libuncased-f7fb80d3681fb1a7.rlib: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/serde.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/owned.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/borrowed.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/as_uncased.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/x86_64-unknown-linux-gnu/release/deps/uncased-f7fb80d3681fb1a7.d: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/serde.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/owned.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/borrowed.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/as_uncased.rs
+
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/lib.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/serde.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/owned.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/borrowed.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/uncased-0.9.7/src/as_uncased.rs:

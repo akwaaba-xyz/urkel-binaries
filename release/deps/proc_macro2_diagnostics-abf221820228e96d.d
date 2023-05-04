@@ -1,0 +1,10 @@
+/Users/rudyfraser/Projects/papertree-urkel/release/deps/proc_macro2_diagnostics-abf221820228e96d.rmeta: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/ext.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/diagnostic.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/line.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/release/deps/libproc_macro2_diagnostics-abf221820228e96d.rlib: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/ext.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/diagnostic.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/line.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/release/deps/proc_macro2_diagnostics-abf221820228e96d.d: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/ext.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/diagnostic.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/line.rs
+
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/lib.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/ext.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/diagnostic.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro2-diagnostics-0.10.0/src/line.rs:

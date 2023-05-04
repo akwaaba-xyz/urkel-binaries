@@ -1,0 +1,2 @@
+web: ROCKET_PORT=$PORT ROCKET_ADDRESS=0.0.0.0 ROCKET_ENV=prod ./x86_64-unknown-linux-gnu/release/urkel
+fga: OPENFGA_HTTP_ADDR=0.0.0.0:8001 ./openfga run --datastore-engine postgres --datastore-uri $DATABASE_URL --metrics-enabled=false

@@ -1,0 +1,12 @@
+/Users/rudyfraser/Projects/papertree-urkel/release/deps/bitflags-383ecb4500637a9d.rmeta: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/parser.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/traits.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/public.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/internal.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/external.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/release/deps/libbitflags-383ecb4500637a9d.rlib: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/parser.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/traits.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/public.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/internal.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/external.rs
+
+/Users/rudyfraser/Projects/papertree-urkel/release/deps/bitflags-383ecb4500637a9d.d: /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/lib.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/parser.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/traits.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/public.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/internal.rs /Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/external.rs
+
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/lib.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/parser.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/traits.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/public.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/internal.rs:
+/Users/rudyfraser/.cargo/registry/src/github.com-1ecc6299db9ec823/bitflags-2.1.0/src/external.rs:

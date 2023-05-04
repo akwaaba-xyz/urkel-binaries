@@ -1,0 +1,8 @@
+authn:
+  method: preshared
+  preshared:
+    keys: ["1EhsSVoS0PSAQFwXc8INzs6evZVZg9au"]
+playground:
+  enabled: false
+http:
+  enabled: false
