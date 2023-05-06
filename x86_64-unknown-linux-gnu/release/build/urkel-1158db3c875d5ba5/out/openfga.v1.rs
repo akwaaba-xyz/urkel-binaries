@@ -63,22 +63,12 @@ pub struct RelationMetadata {
 pub struct RelationReference {
     #[prost(string, tag = "1")]
     pub r#type: ::prost::alloc::string::String,
-    #[prost(oneof = "relation_reference::RelationOrWildcard", tags = "2, 3")]
-    pub relation_or_wildcard: ::core::option::Option<
-        relation_reference::RelationOrWildcard,
-    >,
-}
-/// Nested message and enum types in `RelationReference`.
-pub mod relation_reference {
-    #[derive(serde::Serialize, serde::Deserialize)]
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum RelationOrWildcard {
-        #[prost(string, tag = "2")]
-        Relation(::prost::alloc::string::String),
-        #[prost(message, tag = "3")]
-        Wildcard(super::Wildcard),
-    }
+    #[prost(string, optional, tag = "2")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relation: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "3")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wildcard: ::core::option::Option<Wildcard>,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
